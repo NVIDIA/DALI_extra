@@ -1,3 +1,19 @@
+Information about source of used images and its licenses
+========================================================
+
+
+
+Optical flow test data
+======================
+//DALI_extra/db/optical_flow/slow_preset/frame_reference.png
+//DALI_extra/db/optical_flow/slow_preset/frame_input.png
+© copyright Blender Foundation | www.sintel.org
+Creative Commons Attribution 3.0 license
+
+
+
+
+======================
 Image source - pixabay.com
 
 License :
