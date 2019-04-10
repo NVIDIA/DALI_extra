@@ -9,6 +9,7 @@ Optical flow test data
 //DALI_extra/db/optical_flow/slow_preset/frame_input.png
 //DALI_extra/db/optical_flow/cave
 //DALI_extra/db/optical_flow/sintel_trailer/sintel_trailer.mp4
+//DALI_extra/db/optical_flow/sintel_trailer/sintel_trailer_short.mp4
 © copyright Blender Foundation | www.sintel.org
 Creative Commons Attribution 3.0 license
 
