@@ -3,3 +3,4 @@ db/lmdb/data.mdb filter=lfs diff=lfs merge=lfs -text
 db/recordio/train.rec filter=lfs diff=lfs merge=lfs -text
 db/c2lmdb/ filter=lfs diff=lfs merge=lfs -text
 db/c2lmdb/data.mdb filter=lfs diff=lfs merge=lfs -text
+*.mp4 filter=lfs diff=lfs merge=lfs -text
