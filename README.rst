@@ -5,6 +5,15 @@ NVIDIA DALI
 
 This repository contains extra data used in tests for the NVIDIA DALI project.
 
+Usage
+=====
+
+1. Download and install Git LFS from:
+https://git-lfs.github.com/
+
+2. Clone the repository:
+git clone https://github.com/NVIDIA/DALI_extra.git
+
 Resources
 =========
 * Homepage: https://github.com/NVIDIA/DALI
@@ -15,11 +24,11 @@ Contributing
 
 Before contributing please:
 
-* make sure that you really need to add additional data and no exiting can be used
-* when adding it make sure that:
-    * No personal information sufficient to identify a person (e.g., face, license plates)
-    * No prominent logo usage (e.g., a picture of traffic that happens to include a Coke truck is okay, a picture solely of a Coke billboard is not)
-    * The image is appropriate (e.g., not porn)
+* make sure that you really need to add additional data and no existing can be used
+* make sure that:
+    * data contains no personal information sufficient to identify a person (e.g., face, license plates)
+    * there's no prominent trademark usage (e.g., a picture of traffic that happens to include a Coke truck is okay, a picture solely of a Coke billboard is not)
+    * the content is appropriate (i.e. does not contain nudity, graphic violence or otherwise offensive or disgusting imagery)
 * print, sign and send NVIDIA_CLA_v1.0.1.docx to Dali-Team@nvidia.com
 
 
