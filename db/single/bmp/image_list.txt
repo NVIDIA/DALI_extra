@@ -9,3 +9,6 @@
 0/cat-3591348_640.bmp 0
 0/cat-2184682_640.bmp 0
 0/cat-3113513_640.bmp 0
+0/cat-111793_640_grayscale.bmp
+0/cat-111793_640_palette_1bit.bmp
+0/cat-111793_640_palette_8bit.bmp
