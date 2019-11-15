@@ -5,4 +5,4 @@ db/c2lmdb/ filter=lfs diff=lfs merge=lfs -text
 db/c2lmdb/data.mdb filter=lfs diff=lfs merge=lfs -text
 *.mp4 filter=lfs diff=lfs merge=lfs -text
 *.tfrecord filter=lfs diff=lfs merge=lfs -text
-db/MNIST/* filter=lfs diff=lfs merge=lfs -text
+db/MNIST/*.jpg filter=lfs diff=lfs merge=lfs -text
