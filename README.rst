@@ -31,6 +31,12 @@ Before contributing please:
     * the content is appropriate (i.e. does not contain nudity, graphic violence or otherwise offensive or disgusting imagery)
 * print, sign and send NVIDIA_CLA_v1.0.1.docx to Dali-Team@nvidia.com
 
+Licence
+=======
+
+Unless stated otherwise DALI_extra is licenced under Apache 2.0
+
+MNIST dataset contained within DALI_extra is licenced under Creative Commons Attribution-ShareAlike 3.0 Unported
 
 .. |License| image:: https://img.shields.io/badge/License-Apache%202.0-blue.svg
    :target: https://opensource.org/licenses/Apache-2.0

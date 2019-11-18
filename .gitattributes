@@ -7,3 +7,5 @@ db/c2lmdb/data.mdb filter=lfs diff=lfs merge=lfs -text
 *.tfrecord filter=lfs diff=lfs merge=lfs -text
 db/c2lmdb_no_label/data.mdb filter=lfs diff=lfs merge=lfs -text
 db/lmdb_no_label/data.mdb filter=lfs diff=lfs merge=lfs -text
+db/MNIST/training/data.mdb filter=lfs diff=lfs merge=lfs -text
+db/MNIST/testing/data.mdb filter=lfs diff=lfs merge=lfs -text
