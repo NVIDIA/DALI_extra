@@ -1,6 +1,6 @@
 |License|
 
-This is MNIST_ dataset originaly created by Yann LeCun (Courant Institute, NYU), Corinna Cortes (Google Labs, New York) and Christopher J.C. Burges (Microsoft Research, Redmond) saved as JPEG files compatible with DALI file reader.
+This is MNIST_ dataset originaly created by Yann LeCun (Courant Institute, NYU), Corinna Cortes (Google Labs, New York) and Christopher J.C. Burges (Microsoft Research, Redmond) saved as JPEG images in LMDB format compatible with DALI file reader.
 
 
 Licence
