@@ -13,5 +13,7 @@ Video files used for tests were generated with command below:
   # Transcode video to 25fps at variable frame rate.
   # 180 frames, time deltas spaced between 1/30ms and 1/20ms. Duration ~7s.
   ffmpeg -i cfr_test.mp4 -vsync vfr -vf setpts='N/(25*TB)' vfr_test.mp4
+  # Create a 10 second 25fps constant frame rate video with the frame number burned into the frame at the bottom and the timestsamp at the top
+  ffmpeg -f lavfi  -i  "nullsrc='s=512x512:d=10:r=25',geq='r=0:g=0:b=0',scale=out_range=full,format=yuv420p,drawtext=fontfile=Arial.ttf: text=%{n}: x=(w-tw)/2: y=h-(2*lh): fontsize=20: fontcolor=white: box=1: boxcolor=0x00000099, drawtext=fontfile=Arial.ttf: text=%{pts}: x=(w-tw)/2: y=2*lh: fontsize=20: fontcolor=white: box=1: boxcolor=0x00000099" test_label.mp4
 
 provided in the issue in the main DALI repository (https://github.com/NVIDIA/DALI/issues/1041).
