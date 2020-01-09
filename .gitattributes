@@ -9,3 +9,4 @@ db/c2lmdb_no_label/data.mdb filter=lfs diff=lfs merge=lfs -text
 db/lmdb_no_label/data.mdb filter=lfs diff=lfs merge=lfs -text
 db/MNIST/training/data.mdb filter=lfs diff=lfs merge=lfs -text
 db/MNIST/testing/data.mdb filter=lfs diff=lfs merge=lfs -text
+db/coco_dummy/small_coco.tfrecord filter=lfs diff=lfs merge=lfs -text
