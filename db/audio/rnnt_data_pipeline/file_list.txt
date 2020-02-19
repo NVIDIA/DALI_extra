@@ -1,0 +1,1 @@
+input_recording.wav 0
