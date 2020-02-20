@@ -1,1 +1,2 @@
-input_recording.wav 0
+and_showed_itself.wav 0
+asked_her_father.wav 0
