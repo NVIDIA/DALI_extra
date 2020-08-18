@@ -1,0 +1,8 @@
+jpeg/1.jpg 1
+jpeg/2.jpg 2
+jpeg/3.jpg 3
+jpeg/4.jpg 4
+bmp/1.bmp 1
+bmp/2.bmp 2
+bmp/3.bmp 3
+bmp/4.bmp 4
