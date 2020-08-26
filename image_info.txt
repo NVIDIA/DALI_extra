@@ -227,3 +227,11 @@ Audio data
   LibriSpeech ASR corpus is licensed under a
   Creative Commons Attribution 4.0 International License.
   See <http://creativecommons.org/licenses/by/4.0/>.
+
+
+Medical scans
+==========================
+
+./db/3D/MRI/Knee
+  The directory content is being made available for use with the DALI library with the express, revocable consent of an anonymous NVIDIA employee. Please contact privacy@nvidia.com for any inquiries.
+
