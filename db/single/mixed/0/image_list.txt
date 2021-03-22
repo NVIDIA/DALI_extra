@@ -12,3 +12,4 @@ dog-3277414_640.jpg
 422-odd-width.jpg
 444.jpg
 411-non-multiple-4-width.jpg
+2x4.jpg
