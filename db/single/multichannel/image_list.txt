@@ -1,0 +1,13 @@
+with_alpha/cat-111793_640-alpha.jp2 0
+with_alpha/cat-111793_640-alpha.png 0
+tiff_multichannel/cat-1046544_640.tiff 0
+tiff_multichannel/cat-111793_640.tiff 0
+tiff_multichannel/cat-1245673_640.tiff 0
+tiff_multichannel/cat-2184682_640.tiff 0
+tiff_multichannel/cat-300572_640.tiff 0
+tiff_multichannel/cat-3113513_640.tiff 0
+tiff_multichannel/cat-3449999_640.tiff 0
+tiff_multichannel/cat-3504008_640.tiff 0
+tiff_multichannel/cat-3591348_640.tiff 0
+tiff_multichannel/kitty-2948404_640.tiff 0
+tiff_multichannel/domestic-cat-726989_640.tiff 0
