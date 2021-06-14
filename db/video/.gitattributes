@@ -1,0 +1,2 @@
+mjpeg/mjpeg.avi filter=lfs diff=lfs merge=lfs -text
+vp8/vp8.webm filter=lfs diff=lfs merge=lfs -text
