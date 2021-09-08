@@ -20,7 +20,7 @@ Contents
 +--------------------+-------------------------------+
 | cross.tar          | a webdataset archive for      |
 |                    | the cross-check test          |
-|                    | containing files that         |
+|                    | containing files that start   |
 |                    | with a dot, non-file entries, |
 |                    | and missing extensions        |
 +--------------------+-------------------------------+
