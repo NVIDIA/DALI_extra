@@ -31,10 +31,6 @@ Contents
 |                    | float16, int32 and float64,   |
 |                    | repeated 10 times             |
 +--------------------+-------------------------------+
-| hidden.tar         | a webdataset archive with     |
-|                    | all samples starting with     |
-|                    | a dot                         |
-+--------------------+-------------------------------+
 | single.tar         | a webdataset archive with     |
 |                    | a single sample with a        |
 |                    | single component              |
@@ -46,11 +42,6 @@ Contents
 |                    | (that have the same name      |
 |                    | as the sample but different   |
 |                    | extensions)                   |
-+--------------------+-------------------------------+
-| types_contents.tar | a webdataset archive with     |
-|                    | entries of all possible types |
-|                    | and file entries having 16    |
-|                    | bytes of zeros                |
 +--------------------+-------------------------------+
 | wide.tar           | a webdataset archive with     |
 |                    | a single sample with a 1000   |
