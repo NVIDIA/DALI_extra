@@ -6,3 +6,6 @@ ffmpeg -i test.mp4 %03d.png
 
 Build video from frames:
 ffmpeg -r 60 -i %03d.png -c:v libx264 -g 10 -keyint_min 10 -vf fps=60 -pix_fmt yuv420p test.mp4
+
+Transcode file to VFR, add keyframes:
+ffmpeg -i test_1.mp4 -vsync vfr -vf setpts='N/(25*TB)' -g 10 -keyint_min 10  test_2.mp4
