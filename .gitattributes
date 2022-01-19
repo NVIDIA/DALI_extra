@@ -12,3 +12,4 @@ db/MNIST/testing/data.mdb filter=lfs diff=lfs merge=lfs -text
 db/coco_dummy/small_coco.tfrecord filter=lfs diff=lfs merge=lfs -text
 db/video/containers/ filter=lfs diff=lfs merge=lfs -text
 *.tar filter=lfs diff=lfs merge=lfs -text
+*.avi filter=lfs diff=lfs merge=lfs -text
