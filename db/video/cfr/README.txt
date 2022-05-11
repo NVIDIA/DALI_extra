@@ -9,3 +9,6 @@ ffmpeg -r 60 -i %03d.png -c:v libx264 -g 10 -keyint_min 10 -vf fps=60 -pix_fmt y
 
 Avi files are transcoded mp4 files:
 ffmpeg -i test.mp4 -q:a 0 -q:v 0 test.avi
+
+HEVC files are transcoded .h264 files:
+ffmpeg -i test.mp4 -c:v libx265 -vtag hvc1 test_hevc.mp4
