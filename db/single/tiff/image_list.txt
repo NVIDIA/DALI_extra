@@ -11,12 +11,3 @@
 0/cat-2184682_640.tiff 0
 0/cat-3113513_640.tiff 0
 various_encoding/cat-1046544_640_zstd.tiff 1
-orientation/cat-1046544_640_horizontal.tiff
-orientation/cat-1046544_640_mirror_horizontal_rotate_270.tiff
-orientation/cat-1046544_640_mirror_horizontal_rotate_90.tiff
-orientation/cat-1046544_640_mirror_horizontal.tiff
-orientation/cat-1046544_640_mirror_vertical.tiff
-orientation/cat-1046544_640_no_orientation.tiff
-orientation/cat-1046544_640_rotate_180.tiff
-orientation/cat-1046544_640_rotate_270.tiff
-orientation/cat-1046544_640_rotate_90.tiff

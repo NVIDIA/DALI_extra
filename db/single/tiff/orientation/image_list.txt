@@ -1,9 +1,0 @@
-cat-1046544_640_horizontal.tiff
-cat-1046544_640_mirror_horizontal_rotate_270.tiff
-cat-1046544_640_mirror_horizontal_rotate_90.tiff
-cat-1046544_640_mirror_horizontal.tiff
-cat-1046544_640_mirror_vertical.tiff
-cat-1046544_640_no_orientation.tiff
-cat-1046544_640_rotate_180.tiff
-cat-1046544_640_rotate_270.tiff
-cat-1046544_640_rotate_90.tiff
