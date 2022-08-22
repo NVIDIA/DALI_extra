@@ -23,10 +23,11 @@ np.save('site-1534685_1280', np.asarray(img))
 cropped = img.crop((20, 5, 1000, 800))
 np.save('site-1534685_1280_roi', np.asarray(cropped))
 
-def rgb_to_ycbcr(rgb):
-    ycbcr_weights = np.asarray([[0.257, 0.504, 0.098],
-                                [-0.148, -0.291, 0.439],
-                                [0.439, -0.368, -0.071]]).T
+# https://en.wikipedia.org/wiki/YCbCr#ITU-R_BT.601_conversion
+def rgb_to_ycbcr(rgb)
+    ycbcr_weights = np.asarray([[ 0.257,  0.504,  0.098],
+                                [-0.148, -0.291,  0.439],
+                                [ 0.439, -0.368, -0.071]]).T
     ycbcr = np.matmul(rgb, ycbcr_weights) + np.asarray([0.0625, 0.5, 0.5])
     return ycbcr
 
