@@ -20,6 +20,24 @@ import numpy as np
 img = Image.open('../../jpeg/134/site-1534685_1280.jpg')
 np.save('site-1534685_1280', np.asarray(img))
 
-img = img.crop((20, 5, 1000, 800))
-np.save('site-1534685_1280_roi', np.asarray(img))
+cropped = img.crop((20, 5, 1000, 800))
+np.save('site-1534685_1280_roi', np.asarray(cropped))
+
+# https://en.wikipedia.org/wiki/YCbCr#ITU-R_BT.601_conversion
+def rgb_to_ycbcr(rgb)
+    ycbcr_weights = np.asarray([[ 0.257,  0.504,  0.098],
+                                [-0.148, -0.291,  0.439],
+                                [ 0.439, -0.368, -0.071]]).T
+    ycbcr = np.matmul(rgb, ycbcr_weights) + np.asarray([0.0625, 0.5, 0.5])
+    return ycbcr
+
+def to_uint8(float_image):
+    return np.round((float_image * 255) + 1).astype('uint8')
+
+def get_ycbcr(image):
+    rgb = np.asarray(img).astype('float32') / 255
+    ycbcr = rgb_to_ycbcr(rgb)
+    return to_uint8(ycbcr)
+
+np.save('site-1534685_1280_ycbcr', get_ycbcr(img))
 
