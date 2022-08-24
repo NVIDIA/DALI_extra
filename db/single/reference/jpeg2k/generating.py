@@ -32,4 +32,6 @@ gen_reference('0/cat-2184682_640')
 gen_reference('0/cat-300572_640')
 gen_reference('0/cat-3113513_640')
 gen_reference_roi('2/tiled-cat-1046544_640', (220, 178, 290, 456))
+gen_reference_roi('2/tiled-cat-111793_640', (317, 9, 325, 58))
+gen_reference_roi('2/tiled-cat-3113513_640', (1, 2, 400, 400))
 
