@@ -18,11 +18,20 @@ from PIL import Image
 import numpy as np
 
 def gen_reference(name):
-	img = Image.open('../../jpeg2k/0/' + name + '.jp2')
+	img = Image.open('../../jpeg2k/' + name + '.jp2')
 	np.save(name, np.asarray(img))
 
-gen_reference('cat-1245673_640')
-gen_reference('cat-2184682_640')
-gen_reference('cat-300572_640')
-gen_reference('cat-3113513_640')
+def gen_reference_roi(name, roi):
+	img = Image.open('../../jpeg2k/' + name + '.jp2')
+	img = img.crop(roi)
+	np.save(name + '_roi', np.asarray(img))
+
+gen_reference('0/cat-1245673_640')
+gen_reference_roi('0/cat-1245673_640', (33, 17, 489, 276))
+gen_reference('0/cat-2184682_640')
+gen_reference('0/cat-300572_640')
+gen_reference('0/cat-3113513_640')
+gen_reference_roi('2/tiled-cat-1046544_640', (220, 178, 290, 456))
+gen_reference_roi('2/tiled-cat-111793_640', (317, 9, 325, 58))
+gen_reference_roi('2/tiled-cat-3113513_640', (1, 2, 600, 200))
 
