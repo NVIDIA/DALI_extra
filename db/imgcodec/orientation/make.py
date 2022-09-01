@@ -13,7 +13,7 @@ images = [
     ('mirror_vertical', np.flip(cat, axis=0)),
     ('mirror_horizontal_rotate_270', np.flip(np.rot90(cat, 3), axis=1)),
     ('rotate_90', np.rot90(cat)),
-    ('mirror_horizontal_rotate_90', np.rot90(np.flip(cat, axis=0))),
+    ('mirror_horizontal_rotate_90', np.flip(np.rot90(cat), axis=1)),
     ('rotate_270', np.rot90(cat, 3)),
 ]
 
