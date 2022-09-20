@@ -18,3 +18,9 @@ np.save(os.path.join(tiff_ref_path, '0/cat-111793_640.tiff.npy'), img)
 gray = rgb_to_gray(img).astype('uint8')
 tifffile.imwrite(os.path.join(tiff_path, '0/cat-111793_640_gray.tiff'), gray)
 np.save(os.path.join(tiff_ref_path, '0/cat-111793_640_gray.tiff.npy'), gray)
+
+img1 = plt.imread(os.path.join(tiff_path, '0/cat-3449999_640.tiff')).astype('uint8')
+np.save(os.path.join(tiff_ref_path, '0/cat-3449999_640.tiff.npy'), img1)
+
+img2 = plt.imread(os.path.join(tiff_path, '0/cat-3504008_640.tiff')).astype('uint8')
+np.save(os.path.join(tiff_ref_path, '0/cat-3504008_640.tiff.npy'), img2)
