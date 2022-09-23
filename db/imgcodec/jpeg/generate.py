@@ -17,17 +17,21 @@
 from PIL import Image
 import numpy as np
 
-def save_reference(filename):
-	img = Image.open(filename + '.jpg')
+def save_reference(filename, angle, flip_x, flip_y):
+	img = Image.open(filename + '.jpg').rotate(angle, expand=True)
+	if flip_x:
+		img = img.transpose(Image.FLIP_LEFT_RIGHT)
+	if flip_y:
+		img = img.transpose(Image.FLIP_TOP_BOTTOM)
 	np.save(filename, np.asarray(img))
 
-save_reference('orientation/padlock-406986_640_horizontal')
-save_reference('orientation/padlock-406986_640_mirror_horizontal_rotate_270')
-save_reference('orientation/padlock-406986_640_mirror_vertical')
-save_reference('orientation/padlock-406986_640_no_orientation')
-save_reference('orientation/padlock-406986_640_rotate_270')
-save_reference('orientation/padlock-406986_640_mirror_horizontal')
-save_reference('orientation/padlock-406986_640_mirror_horizontal_rotate_90')
-save_reference('orientation/padlock-406986_640_no_exif')
-save_reference('orientation/padlock-406986_640_rotate_180')
-save_reference('orientation/padlock-406986_640_rotate_90')
+save_reference('orientation/padlock-406986_640_horizontal', 0, False, False)
+save_reference('orientation/padlock-406986_640_mirror_horizontal_rotate_270', 90, True, False)
+save_reference('orientation/padlock-406986_640_mirror_vertical', 0, False, True)
+save_reference('orientation/padlock-406986_640_no_orientation', 0, False, False)
+save_reference('orientation/padlock-406986_640_rotate_270', 90, False, False)
+save_reference('orientation/padlock-406986_640_mirror_horizontal', 0, True, False)
+save_reference('orientation/padlock-406986_640_mirror_horizontal_rotate_90', 270, True, False)
+save_reference('orientation/padlock-406986_640_no_exif', 0, False, False)
+save_reference('orientation/padlock-406986_640_rotate_180', 180, False, False)
+save_reference('orientation/padlock-406986_640_rotate_90', 270, False, False)
