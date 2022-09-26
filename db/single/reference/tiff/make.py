@@ -24,3 +24,6 @@ np.save(os.path.join(tiff_ref_path, '0/cat-3449999_640.tiff.npy'), img1)
 
 img2 = plt.imread(os.path.join(tiff_path, '0/cat-3504008_640.tiff')).astype('uint8')
 np.save(os.path.join(tiff_ref_path, '0/cat-3504008_640.tiff.npy'), img2)
+
+palette = plt.imread(os.path.join(tiff_path, '0/cat-300572_640_palette.tiff')).astype('uint8')[:,:,:3]
+np.save(os.path.join(tiff_ref_path, '0/cat-300572_640_palette.tiff.npy'), palette)
