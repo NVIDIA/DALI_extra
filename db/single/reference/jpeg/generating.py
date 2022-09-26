@@ -16,12 +16,7 @@
 
 from PIL import Image
 import numpy as np
-
-img = Image.open('../../jpeg/134/site-1534685_1280.jpg')
-np.save('site-1534685_1280', np.asarray(img))
-
-cropped = img.crop((20, 5, 1000, 800))
-np.save('site-1534685_1280_roi', np.asarray(cropped))
+import cv2
 
 # https://en.wikipedia.org/wiki/YCbCr#ITU-R_BT.601_conversion
 def rgb_to_ycbcr(rgb):
@@ -35,12 +30,30 @@ def to_uint8(float_image):
     return np.round((float_image * 255) + 1).astype('uint8')
 
 def get_ycbcr(image):
-    rgb = np.asarray(img).astype('float32') / 255
+    rgb = np.asarray(image).astype('float32') / 255
     ycbcr = rgb_to_ycbcr(rgb)
     return to_uint8(ycbcr)
 
-np.save('site-1534685_1280_ycbcr', get_ycbcr(img))
+img0_path = '../../jpeg/134/site-1534685_1280.jpg'
+img0 = Image.open(img0_path)
+img0_gray = cv2.imread(img0_path, cv2.IMREAD_GRAYSCALE)
+cropped = img0.crop((20, 5, 1000, 800))
+np.save('site-1534685_1280', np.asarray(img0))
+np.save('site-1534685_1280_gray', np.expand_dims(img0_gray, -1))
+np.save('site-1534685_1280_roi', np.asarray(cropped))
+np.save('site-1534685_1280_ycbcr', get_ycbcr(img0))
 
 # Few more images
-np.save('swan-3584559_640', np.asarray(Image.open('../../jpeg/100/swan-3584559_640.jpg')))
-np.save('snail-4291306_1280', np.asarray(Image.open('../../jpeg/113/snail-4291306_1280.jpg')))
+img1_path = '../../jpeg/100/swan-3584559_640.jpg'
+img1 = Image.open(img1_path)
+img1_gray = cv2.imread(img1_path, cv2.IMREAD_GRAYSCALE)
+np.save('swan-3584559_640', np.asarray(img1))
+np.save('swan-3584559_640_gray', np.expand_dims(img1_gray, -1))
+np.save('swan-3584559_640_ycbcr', get_ycbcr(img1))
+
+img2_path = '../../jpeg/113/snail-4291306_1280.jpg'
+img2 = Image.open(img2_path)
+img2_gray = cv2.imread(img2_path, cv2.IMREAD_GRAYSCALE)
+np.save('snail-4291306_1280', np.asarray(img2))
+np.save('snail-4291306_1280_gray', np.expand_dims(img2_gray, -1))
+np.save('snail-4291306_1280_ycbcr', get_ycbcr(img2))
