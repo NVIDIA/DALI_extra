@@ -12,9 +12,9 @@ images = [
     ('rotate_180', np.rot90(cat, 2)),
     ('mirror_vertical', np.flip(cat, axis=0)),
     ('mirror_horizontal_rotate_270', np.rot90(np.flip(cat, axis=1))),
-    ('rotate_90', np.rot90(cat)),
+    ('rotate_90', np.rot90(cat, 3)),
     ('mirror_horizontal_rotate_90', np.rot90(np.flip(cat, axis=1), 3)),
-    ('rotate_270', np.rot90(cat, 3)),
+    ('rotate_270', np.rot90(cat)),
 ]
 
 for name, img in images:
