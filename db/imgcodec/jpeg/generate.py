@@ -18,11 +18,12 @@ from PIL import Image
 import numpy as np
 
 def save_reference(filename, angle, flip_x, flip_y):
-	img = Image.open(filename + '.jpg').rotate(angle, expand=True)
+	img = Image.open(filename + '.jpg')
 	if flip_x:
 		img = img.transpose(Image.FLIP_LEFT_RIGHT)
 	if flip_y:
 		img = img.transpose(Image.FLIP_TOP_BOTTOM)
+	img = img.rotate(angle, expand=True)
 	np.save(filename, np.asarray(img))
 
 save_reference('orientation/padlock-406986_640_horizontal', 0, False, False)
