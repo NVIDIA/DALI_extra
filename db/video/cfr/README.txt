@@ -12,3 +12,6 @@ ffmpeg -i test.mp4 -q:a 0 -q:v 0 test.avi
 
 HEVC files are transcoded .h264 files:
 ffmpeg -i test.mp4 -c:v libx265 -vtag hvc1 test_hevc.mp4
+
+MPEG4 files are transcoded .h264 files:
+ffmpeg -i test.mp4 -c:v mpeg4 test_mpeg4.mp4
