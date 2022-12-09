@@ -17,5 +17,5 @@ MPEG4 files are transcoded .h264 files:
 ffmpeg -i test.mp4 -c:v mpeg4 test_mpeg4.mp4
 
 RAW files were generated with:
-ffmpeg -i test_1.mp4 -c:v libx264 -f rawvideo test_1.h264
-ffmpeg -i test_1.mp4 -c:v libx265 -f rawvideo test_1.h265
+ffmpeg -i test.mp4 -c:v libx264 -f rawvideo -bf 0 test.h264
+ffmpeg -i test.mp4 -c:v libx265 -f rawvideo -bf 0 test.h265
