@@ -29,25 +29,32 @@ def rgb_to_ycbcr(rgb):
 def to_uint8(float_image):
     return np.round((float_image * 255) + 1).astype('uint8')
 
+def hwc_to_chw(image):
+    return np.transpose(image, (2, 0, 1))
+
+def save(path, arr):
+    np.save(path, arr)
+    np.save(path + "_chw", hwc_to_chw(arr))
+
 def gen_reference(name):
     img = Image.open('../../jpeg2k/' + name + '.jp2')
-    np.save(name, np.asarray(img))
+    save(name, np.asarray(img))
 
 def gen_reference_roi(name, roi):
     img = Image.open('../../jpeg2k/' + name + '.jp2')
     img = img.crop(roi)
-    np.save(name + '_roi', np.asarray(img))
+    save(name + '_roi', np.asarray(img))
 
 def gen_reference_ycbcr(name):
     img = Image.open('../../jpeg2k/' + name + '.jp2')
     rgb = np.asarray(img).astype('float32') / 255
     ycbcr = rgb_to_ycbcr(rgb)
-    np.save(name + '_ycbcr', to_uint8(ycbcr))
+    save(name + '_ycbcr', to_uint8(ycbcr))
 
 def gen_reference_gray(name):
     img_gray = cv2.imread('../../jpeg2k/' + name + '.jp2', cv2.IMREAD_GRAYSCALE)
     gray = np.expand_dims(img_gray, -1)
-    return np.save(name + '_gray', gray)
+    save(name + '_gray', gray)
 
 gen_reference('0/cat-1245673_640')
 gen_reference_roi('0/cat-1245673_640', (33, 17, 489, 276))
