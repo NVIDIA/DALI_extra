@@ -17,3 +17,4 @@ db/single/reference/fits/* filter=lfs diff=lfs merge=lfs -text
 *.mkv filter=lfs diff=lfs merge=lfs -text
 *.h264 filter=lfs diff=lfs merge=lfs -text
 *.h265 filter=lfs diff=lfs merge=lfs -text
+*.mp4 filter=lfs diff=lfs merge=lfs -text
