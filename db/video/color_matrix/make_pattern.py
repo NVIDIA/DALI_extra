@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # Writes the RGB test pattern (1920x1080) the BT.709 clip is made from.
 #
-# Top half: 8 flat bars of saturated colours (and a grey), where a wrong YUV->RGB matrix shows
-# clearly and chroma subsampling does not matter in the bar interiors. Bottom half: ramps.
+# Top half: 10 flat bars: saturated colours, a grey, black and white. A wrong YUV->RGB matrix shows
+# clearly in the colours and chroma subsampling does not matter in the bar interiors. Black and
+# white (0 and 255) are the ends of the range: in limited range video they are Y=16 and Y=235, so
+# they check that the luma is mapped to the whole RGB range (and clamped there). Bottom half: ramps.
 #
 # Usage: make_pattern.py OUTPUT.png      (needs numpy and Pillow)
 import sys
@@ -21,6 +23,8 @@ BARS = [
     ("magenta", (255, 0, 255)),
     ("orange", (255, 128, 0)),
     ("grey", (128, 128, 128)),
+    ("black", (0, 0, 0)),
+    ("white", (255, 255, 255)),
 ]
 
 rgb = np.zeros((H, W, 3), np.uint8)

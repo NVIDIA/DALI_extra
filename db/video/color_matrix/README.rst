@@ -6,8 +6,10 @@ colours for saturated colours (e.g. pure red 255,0,0 comes out as ~234,0,3).
 
 Files:
 
-- ``bars.png``: the RGB source (ground truth). Top half: 8 flat bars (red, green, blue, yellow, cyan,
-  magenta, orange, grey), bottom half: ramps.
+- ``bars.png``: the RGB source (ground truth). Top half: 10 flat bars (red, green, blue, yellow, cyan,
+  magenta, orange, grey, black, white), bottom half: ramps. Black (0, 0, 0) and white (255, 255, 255)
+  are the ends of the range: in the limited range clips they are Y=16 and Y=235, so they check that
+  the luma is mapped to the whole range and clamped there.
 - ``bt709_limited_1080p.mp4``: 8 frames, 1920x1080, H.264, YUV 4:2:0, BT.709, limited range.
 - ``bt709_limited_1080p_vp9.mp4``: the same in VP9 (the CPU variant of the video reader supports
   only VP8/VP9).
@@ -60,6 +62,7 @@ All frames of a clip are identical, so any frame can be compared with the refere
 
 How to compare: the codec and the chroma subsampling make the values differ slightly from
 ``bars.png``, mostly near the edges of the bars. Compare the mean colour of the interior of each bar
-(for example, columns ``i*240+40`` to ``(i+1)*240-40`` and rows 100 to 440 for bar ``i``). In those
-areas the reference differs from ``bars.png`` by at most 2 (out of 255), while a BT.601 conversion of
-these streams differs by up to 22.
+(for example, columns ``i*192+32`` to ``(i+1)*192-32`` and rows 100 to 440 for bar ``i``). In those
+areas the reference differs from ``bars.png`` by at most 2 (out of 255), and it is exactly (0, 0, 0)
+and (255, 255, 255) in the black and the white bar, while a BT.601 conversion of these streams
+differs by up to 22 in the saturated bars.
