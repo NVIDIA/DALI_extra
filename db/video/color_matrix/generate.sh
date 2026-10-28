@@ -22,13 +22,32 @@ ffmpeg -y -loop 1 -framerate 25 -i bars.png -frames:v 8 \
   -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv \
   bt709_limited_1080p_vp9.mp4
 
+# 3b. Full range (pc) BT.709, to check that the range is honored together with the matrix.
+ffmpeg -y -loop 1 -framerate 25 -i bars.png -frames:v 8 \
+  -vf "scale=out_color_matrix=bt709:out_range=pc:flags=accurate_rnd+full_chroma_int,format=yuv420p,setparams=colorspace=bt709:color_primaries=bt709:color_trc=bt709:range=pc" \
+  -c:v libx264 -preset veryslow -crf 10 -profile:v high -bf 0 \
+  -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range pc \
+  bt709_full_1080p.mp4
+
+# 3c. Limited range BT.709 with the colour description only in the H.264 stream (VUI), not in the
+#     MP4 container (no 'colr' atom; no setparams, which makes the muxer write it). A decoder has to
+#     probe the stream to know the matrix.
+ffmpeg -y -loop 1 -framerate 25 -i bars.png -frames:v 8 \
+  -vf "scale=out_color_matrix=bt709:out_range=tv:flags=accurate_rnd+full_chroma_int,format=yuv420p" \
+  -c:v libx264 -preset veryslow -crf 10 -profile:v high -bf 0 \
+  -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv -movflags -write_colr \
+  bt709_limited_1080p_nocolr.mp4
+
 # 4. The references: the first frame of each clip decoded by ffmpeg, which converts to RGB using the
 #    matrix and range tagged in the stream (BT.709, limited), with default settings.
 ffmpeg -y -i bt709_limited_1080p.mp4 -frames:v 1 -update 1 -pix_fmt rgb24 bt709_limited_1080p_ref.png
 ffmpeg -y -c:v libvpx-vp9 -i bt709_limited_1080p_vp9.mp4 -frames:v 1 -update 1 -pix_fmt rgb24 bt709_limited_1080p_vp9_ref.png
+ffmpeg -y -i bt709_full_1080p.mp4 -frames:v 1 -update 1 -pix_fmt rgb24 bt709_full_1080p_ref.png
+ffmpeg -y -i bt709_limited_1080p_nocolr.mp4 -frames:v 1 -update 1 -pix_fmt rgb24 bt709_limited_1080p_nocolr_ref.png
 
 # Check the stream tags.
-for f in bt709_limited_1080p.mp4 bt709_limited_1080p_vp9.mp4; do
+for f in bt709_limited_1080p.mp4 bt709_limited_1080p_vp9.mp4 bt709_full_1080p.mp4 \
+         bt709_limited_1080p_nocolr.mp4; do
   ffprobe -v error -select_streams v:0 \
     -show_entries stream=codec_name,profile,pix_fmt,width,height,nb_frames,color_space,color_range,color_primaries,color_transfer \
     -of default=nw=1 $f
