@@ -11,11 +11,9 @@ Files:
 - ``bt709_limited_1080p.mp4``: 8 frames, 1920x1080, H.264, YUV 4:2:0, BT.709, limited range.
 - ``bt709_limited_1080p_vp9.mp4``: the same in VP9 (the CPU variant of the video reader supports
   only VP8/VP9).
-- ``bt709_limited_1080p_ref.npy``, ``bt709_limited_1080p_vp9_ref.npy``: the first frame of each clip,
-  decoded and converted to RGB by ffmpeg (which uses the matrix and range tagged in the stream), as
-  (1080, 1920, 3) uint8 numpy arrays.
+- ``bt709_limited_1080p_ref.png``, ``bt709_limited_1080p_vp9_ref.png``: the first frame of each clip,
+  decoded and converted to RGB by ffmpeg (which uses the matrix and range tagged in the stream).
 - ``make_pattern.py``: writes ``bars.png``.
-- ``raw_to_npy.py``: wraps the raw RGB frame written by ffmpeg into a ``.npy`` file.
 - ``generate.sh``: regenerates everything above (needs python3 with numpy and Pillow, and ffmpeg
   with libx264 and libvpx-vp9). The ffmpeg commands are:
 
@@ -37,11 +35,8 @@ Files:
     bt709_limited_1080p_vp9.mp4
 
   # The references: first frame decoded and converted to RGB by ffmpeg with default settings.
-  ffmpeg -y -i bt709_limited_1080p.mp4 -frames:v 1 -f rawvideo -pix_fmt rgb24 ref.rgb
-  python3 raw_to_npy.py ref.rgb bt709_limited_1080p_ref.npy 1920 1080
-  ffmpeg -y -c:v libvpx-vp9 -i bt709_limited_1080p_vp9.mp4 -frames:v 1 -f rawvideo -pix_fmt rgb24 ref.rgb
-  python3 raw_to_npy.py ref.rgb bt709_limited_1080p_vp9_ref.npy 1920 1080
-  rm ref.rgb
+  ffmpeg -y -i bt709_limited_1080p.mp4 -frames:v 1 -update 1 -pix_fmt rgb24 bt709_limited_1080p_ref.png
+  ffmpeg -y -c:v libvpx-vp9 -i bt709_limited_1080p_vp9.mp4 -frames:v 1 -update 1 -pix_fmt rgb24 bt709_limited_1080p_vp9_ref.png
 
 All frames of a clip are identical, so any frame can be compared with the reference.
 
