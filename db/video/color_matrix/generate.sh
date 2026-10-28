@@ -23,9 +23,13 @@ ffmpeg -y -loop 1 -framerate 25 -i bars.png -frames:v 8 \
   bt709_limited_1080p_vp9.mp4
 
 # 4. The references: the first frame of each clip decoded by ffmpeg, which converts to RGB using the
-#    matrix and range tagged in the stream (BT.709, limited), with default settings.
-ffmpeg -y -i bt709_limited_1080p.mp4 -frames:v 1 -update 1 -pix_fmt rgb24 bt709_limited_1080p_ref.png
-ffmpeg -y -c:v libvpx-vp9 -i bt709_limited_1080p_vp9.mp4 -frames:v 1 -update 1 -pix_fmt rgb24 bt709_limited_1080p_vp9_ref.png
+#    matrix and range tagged in the stream (BT.709, limited), with default settings. Saved as
+#    (1080, 1920, 3) uint8 numpy arrays.
+ffmpeg -y -i bt709_limited_1080p.mp4 -frames:v 1 -f rawvideo -pix_fmt rgb24 ref.rgb
+python3 raw_to_npy.py ref.rgb bt709_limited_1080p_ref.npy 1920 1080
+ffmpeg -y -c:v libvpx-vp9 -i bt709_limited_1080p_vp9.mp4 -frames:v 1 -f rawvideo -pix_fmt rgb24 ref.rgb
+python3 raw_to_npy.py ref.rgb bt709_limited_1080p_vp9_ref.npy 1920 1080
+rm ref.rgb
 
 # Check the stream tags.
 for f in bt709_limited_1080p.mp4 bt709_limited_1080p_vp9.mp4; do
