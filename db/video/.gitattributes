@@ -4,3 +4,5 @@ duplicate_pts/h264_nonref_dup_pts.ts filter=lfs diff=lfs merge=lfs -text
 large_pts/h264_large_pts.ts filter=lfs diff=lfs merge=lfs -text
 mpegts/test_1.ts filter=lfs diff=lfs merge=lfs -text
 mpegts/test_2_hevc.ts filter=lfs diff=lfs merge=lfs -text
+mpegts/open_gop_h264.ts filter=lfs diff=lfs merge=lfs -text
+mpegts/test_1_mid_gop.ts filter=lfs diff=lfs merge=lfs -text
