@@ -1,3 +1,4 @@
 mjpeg/mjpeg.avi filter=lfs diff=lfs merge=lfs -text
 vp8/vp8.webm filter=lfs diff=lfs merge=lfs -text
 duplicate_pts/h264_nonref_dup_pts.ts filter=lfs diff=lfs merge=lfs -text
+large_pts/h264_large_pts.ts filter=lfs diff=lfs merge=lfs -text
