@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Regenerates the MPEG-TS copies of test clips and checks them.
 
-Needs Python 3 and PyAV (``pip install av``).
+Needs Python 3 and PyAV 14 or newer (``pip install "av>=14"``).
 
-Each clip is a clip of ../cfr or ../non_idr_keyframes copied to MPEG-TS without re-encoding (the
-H.264/HEVC packets are converted to Annex B, as MPEG-TS stores them), from its first packet or from
-a later one. Only the timestamps change: they all move by the same amount, so that the first dts
-is 0.
+Each clip is a clip of ../cfr or ../non_idr_keyframes copied to MPEG-TS without re-encoding, from
+its first packet or from a later one. The slices are unchanged: the muxer converts the H.264/HEVC
+packets to Annex B, as MPEG-TS stores them, adds an access unit delimiter to every packet, and adds
+the parameter sets of the source (for HEVC with the SEI stored with them) before every IDR (H.264)
+or IRAP (HEVC) picture. The timestamps all move by the same amount, so that the first dts is 0.
 
 Usage: python3 generate.py [--video-dir VIDEO_DIR] [--out-dir OUT_DIR]
 """
@@ -44,6 +45,10 @@ def read_source(path, skip):
 def write(out_path, src_stream, pkts, offset):
     out = av.open(out_path, 'w', format='mpegts')
     ost = out.add_stream_from_template(src_stream)
+    if ost.codec_context.name == 'libx265':
+        # add_stream_from_template gives the stream an encoder, opened on the first mux although
+        # it encodes nothing: keep x265 from printing its banner and "encoded 0 frames"
+        ost.codec_context.options = {'x265-params': 'log-level=none'}
     for e in pkts:
         p = av.Packet(e['data'])
         p.stream = ost
@@ -98,16 +103,18 @@ def verify(out_path, src_path, pkts, offset, src_tb, skip):
     reordered = sum(1 for a, b in zip(rows, rows[1:]) if b[0] < a[0])
     assert reordered > 0, 'no reordered frames'
     # The key flags come from FFmpeg's parser in MPEG-TS: the pictures that decoding can start from
-    # (IDR, IRAP) are flagged, and so can be others (e.g. H.264 I-pictures with a recovery point)
+    # (IDR, IRAP) are flagged, and so can be others (e.g. H.264 pictures after a recovery point SEI)
     keyframe_types = {5} if codec == 'h264' else set(range(16, 22))
     keys = [i for i, r in enumerate(rows) if r[2]]
     keyframes = [i for i, r in enumerate(rows) if keyframe_types & set(nal_types(r[3], codec))]
+    assert keys == [i for i, e in enumerate(pkts) if e['key']], 'key flags differ from the source'
     assert set(keyframes) <= set(keys), 'a keyframe is not flagged'
 
     if skip == 0:
         frames = decode(out_path)
         ref = decode(src_path)
-        assert len(frames) == len(ref) == len(pkts), f'{len(frames)} frames, {len(ref)} in the source'
+        assert len(frames) == len(ref) == len(pkts), (
+            f'{len(frames)} frames, {len(ref)} in the source')
         assert all((a == b).all() for a, b in zip(frames, ref)), 'frames differ from the source'
     else:
         # The first packets refer to pictures left out: only the index of this file is of use

@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Regenerates h264_nonref_dup_pts.ts and checks its structure.
 
-Needs Python 3 and PyAV (``pip install av``).
+Needs Python 3 and PyAV 14 or newer (``pip install "av>=14"``).
 
 The clip holds the first 65 packets in the decoding order (frames 0-64) of
-../sintel/video_files/sintel_trailer-720p_0.mp4, copied to MPEG-TS without re-encoding. Only the
-timestamps change:
+../sintel/video_files/sintel_trailer-720p_0.mp4, copied to MPEG-TS without re-encoding: the slices
+are unchanged, and the muxer adds an access unit delimiter to every packet and the SPS and PPS
+before the IDR picture. The timestamps change:
 
 - every H.264 non-reference picture (nal_ref_idc 0) takes the pts of the frame shown right before
   it,
@@ -27,37 +28,45 @@ DEFAULT_OUT = os.path.join(HERE, 'h264_nonref_dup_pts.ts')
 NUM_FRAMES = 65    # the first 65 packets in the decoding order are exactly frames 0-64
 STEP = 512         # frame duration in the time base of the source (1/12288 s), 24 fps
 OFFSET = 3 * STEP  # keeps every dts >= 0 after moving it one frame earlier
+MUXER_NAL_TYPES = (7, 8, 9)  # SPS, PPS and access unit delimiter, added by the MPEG-TS muxer
 
 
-def nal_headers(data, len_size):
-    """First bytes of the NAL units in a packet: length-prefixed if len_size is set, else Annex
-    B."""
-    out = []
+def nal_units(data, len_size):
+    """The NAL units of a packet: length-prefixed if len_size is set, else Annex B."""
     if len_size is None:
+        starts = []
         i = 0
         while i + 3 < len(data):
             if data[i] == 0 and data[i + 1] == 0 and data[i + 2] == 1:
-                out.append(data[i + 3])
+                starts.append(i + 3)
                 i += 3
             else:
                 i += 1
-        return out
+        ends = [s - 3 for s in starts[1:]] + [len(data)]
+        # a NAL unit does not end with a zero byte: the zero byte of a 4-byte start code is not part
+        # of the NAL unit before it
+        return [data[s:e].rstrip(b'\0') for s, e in zip(starts, ends)]
+    out = []
     i = 0
     while i + len_size <= len(data):
         n = int.from_bytes(data[i:i + len_size], 'big')
         i += len_size
         if n == 0 or i + n > len(data):
             break
-        out.append(data[i])
+        out.append(data[i:i + n])
         i += n
     return out
 
 
-def slice_ref_idc(data, len_size):
+def nal_type(nal):
+    return nal[0] & 0x1f
+
+
+def slice_ref_idc(nals):
     """nal_ref_idc of the first slice NAL unit (type 1 or 5) of a packet."""
-    for h in nal_headers(data, len_size):
-        if h & 0x1f in (1, 5):
-            return (h >> 5) & 3
+    for n in nals:
+        if nal_type(n) in (1, 5):
+            return (n[0] >> 5) & 3
     raise ValueError('no slice NAL unit in the packet')
 
 
@@ -75,8 +84,9 @@ def read_source(path):
         if p.size == 0:
             continue
         data = bytes(p)
-        pkts.append(dict(data=data, pts=p.pts, dts=p.dts, key=p.is_keyframe,
-                         ref=slice_ref_idc(data, len_size)))
+        nals = nal_units(data, len_size)
+        pkts.append(dict(data=data, pts=p.pts, dts=p.dts, key=p.is_keyframe, nals=nals,
+                         ref=slice_ref_idc(nals)))
         if len(pkts) == NUM_FRAMES:
             break
     order = sorted(range(NUM_FRAMES), key=lambda i: pkts[i]['pts'])
@@ -106,35 +116,56 @@ def write(out_path, src_stream, pkts, nonref):
     out.close()
 
 
-def verify(out_path, pkts, nonref, src_tb):
+def decode(path, count=None):
+    c = av.open(path)
+    frames = []
+    for f in c.decode(video=0):
+        frames.append(f.to_ndarray(format='yuv420p'))
+        if count is not None and len(frames) == count:
+            break
+    c.close()
+    return frames
+
+
+def verify(out_path, src_path, pkts, nonref, src_tb):
     c = av.open(out_path)
     st = c.streams.video[0]
     tb = st.time_base
-    rows = [(p.pts, p.dts, bytes(p)) for p in c.demux(st) if p.size]
+    rows = [(p.pts, p.dts, bytes(p), p.is_keyframe) for p in c.demux(st) if p.size]
     c.close()
     assert len(rows) == NUM_FRAMES, f'{len(rows)} packets'
     dts = [r[1] for r in rows]
     assert dts[0] >= 0 and all(b > a for a, b in zip(dts, dts[1:])), 'dts not strictly increasing'
-    assert all(pts >= dts for pts, dts, _ in rows), 'pts < dts'
-    assert all(d.startswith((b'\0\0\1', b'\0\0\0\1')) for _, _, d in rows), 'not Annex B'
-    # the packets keep the decoding order of the source
-    assert {e['frame'] for e, r in zip(pkts, rows) if slice_ref_idc(r[2], None) == 0} == nonref
-    for e, (pts, _, _) in zip(pkts, rows):
+    assert all(pts >= dts for pts, dts, _, _ in rows), 'pts < dts'
+    assert all(d.startswith((b'\0\0\1', b'\0\0\0\1')) for _, _, d, _ in rows), 'not Annex B'
+    nals = [nal_units(d, None) for _, _, d, _ in rows]
+    types = [[nal_type(n) for n in u] for u in nals]
+    first_only = [True] + [False] * (NUM_FRAMES - 1)
+    assert all(t[0] == 9 for t in types), 'a packet does not start with an access unit delimiter'
+    assert [5 in t for t in types] == first_only, 'not only the first picture is an IDR picture'
+    assert [r[3] for r in rows] == first_only, 'not only the first packet is a keyframe'
+    # the packets are those of the source, in its decoding order: the same NAL units, apart from
+    # those that the muxer adds
+    for i, (e, u) in enumerate(zip(pkts, nals)):
+        out_nals = [n for n in u if nal_type(n) not in MUXER_NAL_TYPES]
+        src_nals = [n for n in e['nals'] if nal_type(n) not in MUXER_NAL_TYPES]
+        assert out_nals == src_nals, f'packet {i} differs from the source'
+    for e, (pts, _, _, _) in zip(pkts, rows):
         frame = e['frame'] - 1 if e['frame'] in nonref else e['frame']
         assert Fraction(pts) * tb == Fraction(frame * STEP + OFFSET) * src_tb
     by_pts = {}
-    for e, (pts, _, _) in zip(pkts, rows):
+    for e, (pts, _, _, _) in zip(pkts, rows):
         by_pts.setdefault(pts, []).append(e['frame'])
     ties = sorted(tuple(sorted(v)) for v in by_pts.values() if len(v) > 1)
     assert ties == [(f - 1, f) for f in sorted(nonref)], ties
 
-    c = av.open(out_path)
-    frames = list(c.decode(video=0))
-    c.close()
+    frames = decode(out_path)
     assert len(frames) == NUM_FRAMES, f'{len(frames)} frames decoded'
-    first_nal = rows[0][2][4] & 0x1f if rows[0][2].startswith(b'\0\0\0\1') else rows[0][2][3] & 0x1f
-    return dict(time_base=tb, size=(frames[0].width, frames[0].height),
-                first_pts=min(r[0] for r in rows), ties=ties, first_nal_type=first_nal)
+    ref = decode(src_path, NUM_FRAMES)
+    assert len(ref) == NUM_FRAMES, f'{len(ref)} frames decoded from the source'
+    assert all((a == b).all() for a, b in zip(frames, ref)), 'frames differ from the source'
+    return dict(time_base=tb, size=(frames[0].shape[1], frames[0].shape[0] * 2 // 3),
+                first_pts=min(r[0] for r in rows), ties=ties, first_nal_type=types[0][0])
 
 
 def main():
@@ -150,7 +181,7 @@ def main():
     write(args.out, src_stream, pkts, nonref)
     src_tb = src_stream.time_base
     src.close()
-    info = verify(args.out, pkts, nonref, src_tb)
+    info = verify(args.out, args.src, pkts, nonref, src_tb)
     print(f'{args.out}: {NUM_FRAMES} frames, {info["size"][0]}x{info["size"][1]}, '
           f'time base {info["time_base"]}, first pts {info["first_pts"]}, '
           f'first NAL unit type {info["first_nal_type"]}')

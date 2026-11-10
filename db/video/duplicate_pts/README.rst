@@ -8,8 +8,9 @@ Files:
 
 - ``h264_nonref_dup_pts.ts``: 65 frames, 1280x720, 24 fps, H.264 (High profile), YUV 4:2:0,
   MPEG-TS. The packets are the first 65 packets in the decoding order (frames 0-64) of
-  ``../sintel/video_files/sintel_trailer-720p_0.mp4``, copied without re-encoding. Only the
-  timestamps change:
+  ``../sintel/video_files/sintel_trailer-720p_0.mp4``, copied without re-encoding: the slices are
+  unchanged, and the MPEG-TS muxer adds an access unit delimiter to every packet and the SPS and
+  PPS before the IDR picture. The timestamps change:
 
   - every non-reference picture (``nal_ref_idc`` 0) takes the pts of the frame shown right before it
     in the source,
@@ -22,15 +23,22 @@ Files:
   44, 46, 48, 50, 52, 54, 57, 59, 61 and 63, so 22 pairs of frames share a pts: (12, 13), (15, 16),
   (18, 19), (20, 21), (23, 24), (25, 26), (27, 28), (30, 31), (33, 34), (36, 37), (38, 39),
   (41, 42), (43, 44), (45, 46), (47, 48), (49, 50), (51, 52), (53, 54), (56, 57), (58, 59),
-  (60, 61) and (62, 63). The frame shown before each non-reference picture is a reference picture.
-  Only the first picture is an IDR picture and only the first packet is flagged as a keyframe. The
-  packets are in the Annex B format and start with an access unit delimiter.
+  (60, 61) and (62, 63). The frame shown before each non-reference picture is a reference picture,
+  and it is decoded first: in every pair the reference picture has the lower dts, which is the only
+  thing that orders the two frames of a pair. Only the first picture is an IDR picture and only the
+  first packet is flagged as a keyframe. The packets are in the Annex B format and start with an
+  access unit delimiter.
+
+  Frames 0-12 are identical black frames, and the two frames of the first pair, (12, 13), differ by
+  at most 2 levels: a comparison with a tolerance cannot tell them apart.
 
   The clip is MPEG-TS because MPEG-TS stores the pts and dts of every packet as they are given, so
   the shared timestamps reach the demuxer unchanged.
-- ``generate.py``: regenerates the file and checks it (65 packets and 65 decoded frames, dts
-  strictly increasing, pts >= dts, the frame pairs above sharing a pts, Annex B packets). Needs
-  Python 3 and PyAV (``pip install av``) and the real ``sintel_trailer-720p_0.mp4`` (not a Git LFS
+- ``generate.py``: regenerates the file and checks it (65 packets with the NAL units of the source
+  in its decoding order, dts strictly increasing, pts >= dts, the frame pairs above sharing a pts,
+  Annex B packets that start with an access unit delimiter, only the first packet an IDR picture and
+  flagged as a keyframe, 65 decoded frames the same as those of the source). Needs Python 3, PyAV 14
+  or newer (``pip install "av>=14"``) and the real ``sintel_trailer-720p_0.mp4`` (not a Git LFS
   pointer). The committed file was generated with PyAV 14.1 (FFmpeg 7.1); other versions may write
   a different but equivalent MPEG-TS file:
 
@@ -39,3 +47,6 @@ Files:
   python3 generate.py
   # or, with the source file somewhere else:
   python3 generate.py --src /path/to/sintel_trailer-720p_0.mp4
+
+The video is from the Sintel trailer, (c) copyright Blender Foundation | durian.blender.org,
+licensed under the Creative Commons Attribution 3.0 license.

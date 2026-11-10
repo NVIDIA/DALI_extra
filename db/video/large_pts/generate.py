@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Regenerates h264_large_pts.ts and checks it.
 
-Needs Python 3 and PyAV (``pip install av``).
+Needs Python 3 and PyAV 14 or newer (``pip install "av>=14"``).
 
 The clip holds the first 65 packets in the decoding order (frames 0-64) of
-../sintel/video_files/sintel_trailer-720p_0.mp4, copied to MPEG-TS without re-encoding. Only the
-timestamps change: they all move 30000 s later, so that every pts and dts is above 2^31 in the
-90 kHz time base of MPEG-TS.
+../sintel/video_files/sintel_trailer-720p_0.mp4, copied to MPEG-TS without re-encoding: the slices
+are unchanged, and the muxer adds an access unit delimiter to every packet and the SPS and PPS
+before the IDR picture. The timestamps all move 30000 s later, so that every pts and dts is above
+2^31 in the 90 kHz time base of MPEG-TS.
 
 Usage: python3 generate.py [--src SINTEL_MP4] [--out OUT_TS]
 """
@@ -74,7 +75,9 @@ def verify(out_path, src_path, pkts, offset, src_tb):
     c = av.open(out_path)
     st = c.streams.video[0]
     tb = st.time_base
-    rows = [(p.pts, p.dts) for p in c.demux(st) if p.size]
+    demuxed = [p for p in c.demux(st) if p.size]
+    rows = [(p.pts, p.dts) for p in demuxed]
+    keys = [p.is_keyframe for p in demuxed]
     c.close()
     assert tb == TS_TIME_BASE, tb
     assert len(rows) == NUM_FRAMES, f'{len(rows)} packets'
@@ -85,12 +88,14 @@ def verify(out_path, src_path, pkts, offset, src_tb):
     for e, (pts, dts) in zip(pkts, rows):
         assert Fraction(pts) * tb == Fraction(e['pts'] + offset) * src_tb
         assert Fraction(dts) * tb == Fraction(e['dts'] + offset) * src_tb
-    assert min(min(r) for r in rows) > 2**31, 'a timestamp fits in 32 bits'
+    assert min(min(r) for r in rows) > 2**31, 'a timestamp fits in a signed 32-bit integer'
     assert max(max(r) for r in rows) < 2**33, 'a timestamp wraps around in MPEG-TS'
+    assert keys == [True] + [False] * (NUM_FRAMES - 1), 'not only the first packet is a keyframe'
 
     frames = decode(out_path)
     assert len(frames) == NUM_FRAMES, f'{len(frames)} frames decoded'
     ref = decode(src_path, NUM_FRAMES)
+    assert len(ref) == NUM_FRAMES, f'{len(ref)} frames decoded from the source'
     assert all((a == b).all() for a, b in zip(frames, ref)), 'frames differ from the source'
     return dict(time_base=tb, size=(frames[0].shape[1], frames[0].shape[0] * 2 // 3),
                 first_pts=min(r[0] for r in rows), first_dts=min(r[1] for r in rows))
