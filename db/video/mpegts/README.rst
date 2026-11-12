@@ -41,3 +41,6 @@ write different but equivalent MPEG-TS files:
   python3 generate.py
   # or, with the source files somewhere else:
   python3 generate.py --video-dir /path/to/db/video
+
+The video of ``../duplicate_pts`` and ``../large_pts`` is from the Sintel trailer, (c) copyright
+Blender Foundation | durian.blender.org, licensed under the Creative Commons Attribution 3.0 license.
