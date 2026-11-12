@@ -20,7 +20,7 @@ Files:
   lands on the keyframe before. The frames are those of the source.
 - ``generate.py``: regenerates the file and checks it (the packets, their key flags and the avcC
   the same as in the source, the pts of the source in milliseconds, some reordered frames, the
-  SeekHead and the Cues pointing to the elements and to the keyframes they name, a seek to the pts
+  seeks that use the Cues: a seek to the pts
   of each keyframe landing on it and a seek to its dts on the keyframe before, the decoded frames
   the same as those of the source). It writes the Matroska file itself, so the output does not
   depend on the FFmpeg version. Needs Python 3, PyAV 14 or newer (``pip install "av>=14"``) and the

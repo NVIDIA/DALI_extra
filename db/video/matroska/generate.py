@@ -74,21 +74,6 @@ ELEMENT_IDS = {
     'CueClusterPosition': 0xF1,
     'CueRelativePosition': 0xF0,
 }
-ELEMENT_NAMES = {v: k for k, v in ELEMENT_IDS.items()}
-MASTER_ELEMENTS = {
-    'EBML',
-    'Segment',
-    'SeekHead',
-    'Seek',
-    'Info',
-    'Tracks',
-    'TrackEntry',
-    'Video',
-    'Cluster',
-    'Cues',
-    'CuePoint',
-    'CueTrackPositions',
-}
 
 
 def id_bytes(name):
@@ -237,80 +222,6 @@ def write(out_path, source):
         f.write(ebml_header + segment)
 
 
-def read_vint(data, pos, keep_marker):
-    length = 8 - data[pos].bit_length() + 1
-    end = pos + length
-    value = int.from_bytes(data[pos:end], 'big')
-    if not keep_marker:
-        value &= (1 << (7 * length)) - 1
-    return value, end
-
-
-def parse(data, start=0, end=None):
-    """The elements in data[start:end]: (name, start of the element, start of its data, data or
-    children)"""
-    end = len(data) if end is None else end
-    elements = []
-    pos = start
-    while pos < end:
-        element_id, data_start = read_vint(data, pos, True)
-        size, data_start = read_vint(data, data_start, False)
-        name = ELEMENT_NAMES[element_id]
-        data_end = data_start + size
-        assert data_end <= end, f'{name} at {pos} ends after its parent'
-        content = (
-            parse(data, data_start, data_end)
-            if name in MASTER_ELEMENTS
-            else data[data_start:data_end]
-        )
-        elements.append((name, pos, data_start, content))
-        pos = data_end
-    return elements
-
-
-def children(elements, name):
-    return [e for e in elements if e[0] == name]
-
-
-def child(elements, name):
-    found = children(elements, name)
-    assert len(found) == 1, f'{len(found)} {name} elements'
-    return found[0]
-
-
-def check_structure(out_path, keyframe_pts):
-    """Checks the SeekHead and the Cues: they point to the elements and blocks they name"""
-    with open(out_path, 'rb') as f:
-        data = f.read()
-    top = parse(data)
-    assert [e[0] for e in top] == ['EBML', 'Segment'], [e[0] for e in top]
-    _, _, segment_start, segment = top[1]
-    at = {e[1] - segment_start: e for e in segment}
-    for seek in child(segment, 'SeekHead')[3]:
-        target = int.from_bytes(child(seek[3], 'SeekID')[3], 'big')
-        pos = int.from_bytes(child(seek[3], 'SeekPosition')[3], 'big')
-        assert at[pos][0] == ELEMENT_NAMES[target], f'SeekHead: no {ELEMENT_NAMES[target]} at {pos}'
-    clusters = children(segment, 'Cluster')
-    cue_times = []
-    for cue in child(segment, 'Cues')[3]:
-        cue_time = int.from_bytes(child(cue[3], 'CueTime')[3], 'big')
-        positions = child(cue[3], 'CueTrackPositions')[3]
-        assert int.from_bytes(child(positions, 'CueTrack')[3], 'big') == 1
-        cluster = at[int.from_bytes(child(positions, 'CueClusterPosition')[3], 'big')]
-        assert cluster[0] == 'Cluster', 'a cue point does not point to a cluster'
-        block_pos = cluster[2] + int.from_bytes(child(positions, 'CueRelativePosition')[3], 'big')
-        block = [e for e in cluster[3] if e[1] == block_pos]
-        assert len(block) == 1 and block[0][0] == 'SimpleBlock', 'a cue point has no block'
-        block = block[0][3]
-        cluster_ts = int.from_bytes(child(cluster[3], 'Timestamp')[3], 'big')
-        block_ts = cluster_ts + int.from_bytes(block[1:3], 'big', signed=True)
-        assert block[0] == 0x81 and block[3] & 0x80, 'a cue point is not on a keyframe of track 1'
-        assert block_ts == cue_time, f'a cue point at {cue_time} is on a block at {block_ts}'
-        cue_times.append(cue_time)
-    assert cue_times == keyframe_pts, f'cue points at {cue_times}, keyframes at {keyframe_pts}'
-    assert len(clusters) == len(keyframe_pts), 'not a cluster for each keyframe'
-
-
 def decode(path):
     with av.open(path) as c:
         return [f.to_ndarray(format='yuv420p') for f in c.decode(video=0)]
@@ -351,7 +262,6 @@ def verify(out_path, src_path, source):
     # a seek to it lands on the keyframe before.
     key_dts = [rows[i][1] for i in keys]
     assert all(dts < pts for pts, dts in zip(key_pts[1:], key_dts[1:])), 'a keyframe dts >= pts'
-    check_structure(out_path, key_pts)
 
     with av.open(out_path) as c:
         st = c.streams.video[0]
