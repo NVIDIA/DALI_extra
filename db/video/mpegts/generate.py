@@ -61,7 +61,7 @@ def same_timestamps(pkts, extradata):
 
 def large_timestamps(pkts, extradata):
     """The timestamps of the source, 30000 s later: above 2^31 in the 90 kHz time base"""
-    offset = 30000 * 12288
+    offset = int(30000 / SINTEL_TIME_BASE)
     stamps = [(e['pts'] + offset, e['dts'] + offset, STEP) for e in pkts]
     ticks = [Fraction(t) * SINTEL_TIME_BASE / TS_TIME_BASE for s in stamps for t in s[:2]]
     assert 2**31 < min(ticks) and max(ticks) < 2**33, 'not between 2^31 and 2^33'
